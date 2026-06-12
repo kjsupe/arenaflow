@@ -4,6 +4,12 @@ ArenaFlow is a small browser-based game scheduling and capacity control app for 
 
 It works well for laser tag, but the app supports multiple attractions, so it can also be used for other timed-capacity experiences in the same building.
 
+## Support
+
+ArenaFlow is free to use. If it saves your FEC time or helps your operation, donations are appreciated:
+
+[Support ArenaFlow on Buy Me a Coffee](https://buymeacoffee.com/ksupe)
+
 ## What It Does
 
 - Admin and marshal logins.
