@@ -79,8 +79,6 @@ Detailed Linux and Windows instructions are in [docs/INSTALL.md](docs/INSTALL.md
 
 Basic operating instructions are in [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
 
-GitHub publishing steps are in [docs/PUBLISHING.md](docs/PUBLISHING.md).
-
 Support expectations are in [SUPPORT.md](SUPPORT.md).
 
 ## Production Safety

@@ -85,4 +85,4 @@ The included `.gitignore` is configured to help prevent common mistakes, but rev
 
 ## Reporting Issues
 
-If you publish this project publicly, add your preferred security contact method here, such as a GitHub security advisory policy or email address.
+Use GitHub Issues for general bug reports. Do not include secrets, customer data, ticket codes, PINs, database backups, or `.env` contents in public issues.
