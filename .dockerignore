@@ -1,0 +1,10 @@
+.git/
+__pycache__/
+*.pyc
+data/
+.DS_Store
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.tar.gz

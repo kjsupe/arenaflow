@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ArenaFlow</title>
+    <link rel="icon" id="appFavicon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main id="app">
+      <section class="login-shell" data-view="login">
+        <form class="login-panel" id="loginForm">
+          <div class="brand-block">
+            <img class="app-logo login-logo hidden" id="loginAppLogo" alt="ArenaFlow logo">
+            <span class="brand-kicker">Game Scheduling and Capacity Control</span>
+            <h1>ArenaFlow</h1>
+          </div>
+          <label>
+            Username
+            <input name="username" autocomplete="username" required>
+          </label>
+          <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button class="primary-action" type="submit">Log In</button>
+          <p class="status-line" id="loginStatus"></p>
+        </form>
+      </section>
+
+      <section class="desk-shell hidden" data-view="desk">
+        <header class="topbar">
+          <div class="topbar-brand">
+            <img class="app-logo header-logo hidden" id="headerAppLogo" alt="ArenaFlow logo">
+            <div>
+              <span class="brand-kicker">Operations Desk</span>
+              <h1>ArenaFlow</h1>
+              <p class="product-tagline">Game Scheduling and Capacity Control</p>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-action nav-action active" id="scheduleToggle" type="button">Schedule</button>
+            <button class="ghost-action nav-action" id="settingsToggle" type="button">Settings</button>
+            <span class="session-pill" id="sessionUser"></span>
+            <button class="ghost-action" id="logoutButton" type="button">Log Out</button>
+          </div>
+        </header>
+
+        <section class="screen-pane" id="scheduleScreen">
+          <div class="attraction-tabs" id="attractionTabs" role="tablist" aria-label="Attractions"></div>
+          <section class="control-band">
+            <div class="date-jump">
+              <label>
+                Date
+                <input type="date" id="scheduleDate">
+              </label>
+              <button class="secondary-action today-action" id="todayButton" type="button">Today / Now</button>
+            </div>
+            <label>
+              Active capacity now
+              <input type="number" id="activeBlasters" min="1" max="200">
+            </label>
+            <button class="secondary-action" id="saveBlasters" type="button">Apply From Now</button>
+            <div class="capacity-meter">
+              <span>Current capacity</span>
+              <strong id="capacityText">--</strong>
+            </div>
+            <p class="control-status" id="blasterStatus">Changes apply from the current time forward and carry into future days.</p>
+          </section>
+
+          <section class="workspace">
+            <section class="schedule-column">
+              <div class="section-heading">
+                <h2 id="selectedAttractionTitle">Schedule</h2>
+                <span id="slotSummary"></span>
+              </div>
+              <div class="schedule-grid" id="scheduleGrid"></div>
+            </section>
+
+            <aside class="booking-panel">
+              <div class="section-heading">
+                <h2>New Booking</h2>
+                <span id="selectedSlotLabel">Select a game</span>
+              </div>
+              <form id="bookingForm">
+                <input type="hidden" name="game_time" id="bookingGameTime">
+                <label>
+                  Name or party
+                  <input name="group_name" id="groupName" maxlength="80" autocomplete="off" placeholder="Optional">
+                </label>
+                <label>
+                  Players
+                  <input name="players" id="players" type="number" min="1" max="200" value="1" aria-describedby="playersHint" required>
+                </label>
+                <p class="field-warning hidden" id="playersHint" aria-live="polite"></p>
+                <div class="segmented" role="radiogroup" aria-label="Booking type">
+                  <label>
+                    <input type="radio" name="booking_type" value="walkup" checked>
+                    <span>Walk-up</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="booking_type" value="party">
+                    <span>Party</span>
+                  </label>
+                </div>
+                <label>
+                  Notes
+                  <textarea name="notes" id="notes" rows="3"></textarea>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" id="printTicket" checked>
+                  Print ticket
+                </label>
+                <button class="primary-action" type="submit">Book Players</button>
+                <p class="status-line" id="bookingStatus"></p>
+              </form>
+            </aside>
+          </section>
+        </section>
+
+        <section class="settings-screen hidden" id="settingsScreen">
+          <div class="settings-hero">
+            <div>
+              <span class="brand-kicker">Admin</span>
+              <h2>Settings</h2>
+            </div>
+            <p>Change the operating schedule, ticket printer, marshal logins, and visual theme.</p>
+          </div>
+          <form id="settingsForm" class="settings-grid">
+            <section class="settings-card wide-field">
+              <div class="section-heading">
+                <h2>Theme</h2>
+                <span>Applies to every desk login</span>
+              </div>
+              <div class="theme-picker" role="radiogroup" aria-label="Theme picker">
+                <label class="theme-option theme-laser">
+                  <input type="radio" name="theme" value="laser">
+                  <span class="theme-swatch"><i></i><i></i><i></i></span>
+                  <strong>Laser Red</strong>
+                  <small>Black, grey, and red for your logo</small>
+                </label>
+                <label class="theme-option theme-daylight">
+                  <input type="radio" name="theme" value="daylight">
+                  <span class="theme-swatch"><i></i><i></i><i></i></span>
+                  <strong>Daylight Desk</strong>
+                  <small>Warm, high-contrast front desk palette</small>
+                </label>
+                <label class="theme-option theme-arcade">
+                  <input type="radio" name="theme" value="arcade">
+                  <span class="theme-swatch"><i></i><i></i><i></i></span>
+                  <strong>Arcade Signal</strong>
+                  <small>Deep blue with yellow and coral accents</small>
+                </label>
+                <label class="theme-option theme-coastal">
+                  <input type="radio" name="theme" value="coastal">
+                  <span class="theme-swatch"><i></i><i></i><i></i></span>
+                  <strong>Coastal League</strong>
+                  <small>Teal, navy, and crisp white</small>
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-card wide-field">
+              <div class="section-heading">
+                <h2>App Branding</h2>
+                <span>Login and scheduler header</span>
+              </div>
+              <div class="settings-fields">
+                <label>
+                  Venue name
+                  <input name="venue_name">
+                </label>
+                <label>
+                  Venue timezone
+                  <input name="venue_timezone" placeholder="America/New_York">
+                </label>
+              </div>
+              <div class="logo-upload-row app-logo-upload-row">
+                <label>
+                  Full-color app logo
+                  <input id="appLogoFile" type="file" accept="image/png,image/jpeg,image/webp">
+                  <span class="field-note">Used on the login page and scheduling header. This is separate from the thermal receipt logo.</span>
+                </label>
+                <figure class="logo-preview hidden" id="appLogoPreviewWrap">
+                  <img id="appLogoPreview" alt="Uploaded app logo preview">
+                  <figcaption>Current app logo</figcaption>
+                </figure>
+                <button class="secondary-action" id="clearAppLogo" type="button">Remove Logo</button>
+                <p class="status-line" id="appLogoStatus"></p>
+              </div>
+            </section>
+
+            <section class="settings-card wide-field">
+              <div class="section-heading">
+                <h2>Attractions</h2>
+                <span>Choose which attraction these schedule settings edit</span>
+              </div>
+              <div class="settings-attraction-header">
+                <div class="attraction-tabs admin-attraction-tabs" id="adminAttractionTabs" role="tablist" aria-label="Admin attractions"></div>
+                <button class="secondary-action" id="addAttraction" type="button">Add Attraction</button>
+              </div>
+              <div class="settings-fields">
+                <label>
+                  Attraction name
+                  <input id="attractionName" maxlength="80">
+                </label>
+                <label>
+                  Show on marshal schedule
+                  <select id="attractionActive">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="section-heading">
+                <h2>Attraction Schedule</h2>
+                <span>Fallback hours for the selected attraction</span>
+              </div>
+              <div class="settings-fields">
+                <label>
+                  Open time
+                  <input name="open_time" type="time">
+                </label>
+                <label>
+                  First game time
+                  <input name="first_game_time" type="time">
+                </label>
+                <label>
+                  Close time
+                  <input name="close_time" type="time">
+                </label>
+                <label>
+                  Game interval minutes
+                  <input name="game_interval_minutes" type="number" min="5" max="120">
+                </label>
+                <label>
+                  Max players per game
+                  <input name="max_players_per_game" type="number" min="1" max="200">
+                </label>
+                <label>
+                  Default capacity count
+                  <input name="default_blaster_count" type="number" min="1" max="200">
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="section-heading">
+                <h2>Attraction Ticket</h2>
+                <span>Printed wording and customer changes</span>
+              </div>
+              <div class="settings-fields">
+                <label>
+                  Ticket heading
+                  <input name="ticket_heading" maxlength="60">
+                </label>
+                <label>
+                  Logo text
+                  <input name="ticket_logo_text" maxlength="80">
+                </label>
+                <label>
+                  Customer can change time
+                  <select name="customer_reschedule_enabled">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <span class="field-note">When set to No, printed-ticket links and QR codes will not allow customer self-rescheduling.</span>
+                </label>
+                <label>
+                  Customer can choose last game
+                  <select name="customer_reschedule_last_game">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                  </select>
+                  <span class="field-note">When set to No, online ticket changes hide and block the final scheduled game of the day.</span>
+                </label>
+                <label class="wide-field">
+                  Ticket footer
+                  <textarea name="ticket_footer" rows="2"></textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="settings-card wide-field">
+              <div class="section-heading">
+                <h2>Weekly Hours</h2>
+                <span>Each day can use different game times</span>
+              </div>
+              <div class="weekly-schedule" id="weeklySchedule" aria-label="Weekly schedule"></div>
+            </section>
+
+            <section class="settings-card wide-field">
+              <div class="section-heading">
+                <h2>Holiday Overrides</h2>
+                <span>Specific dates replace the weekly schedule</span>
+              </div>
+              <div class="override-builder">
+                <label>
+                  Date
+                  <input id="overrideDate" type="date">
+                </label>
+                <label>
+                  Label
+                  <input id="overrideLabel" maxlength="80" placeholder="Holiday, private event, closed day">
+                </label>
+                <label class="check-row override-closed">
+                  <input type="checkbox" id="overrideClosed">
+                  Closed
+                </label>
+                <label>
+                  Open
+                  <input id="overrideOpenTime" type="time">
+                </label>
+                <label>
+                  First game
+                  <input id="overrideFirstGameTime" type="time">
+                </label>
+                <label>
+                  Close
+                  <input id="overrideCloseTime" type="time">
+                </label>
+                <label>
+                  Interval
+                  <input id="overrideInterval" type="number" min="5" max="120">
+                </label>
+                <button class="secondary-action" id="addOverride" type="button">Add Override</button>
+              </div>
+              <div class="override-list" id="overrideList" aria-label="Holiday overrides"></div>
+            </section>
+
+            <section class="settings-card">
+              <div class="section-heading">
+                <h2>Printer</h2>
+                <span>Network ticket printer</span>
+              </div>
+              <div class="settings-fields">
+                <label>
+                  Printer mode
+                  <select name="printer_mode">
+                    <option value="dry_run">Dry run</option>
+                    <option value="tcp">Network printer TCP</option>
+                    <option value="cups">CUPS queue</option>
+                  </select>
+                </label>
+                <label>
+                  Printer IP address
+                  <input name="printer_host" placeholder="192.168.1.50">
+                </label>
+                <label>
+                  Printer port
+                  <input name="printer_port" type="number" min="1" max="65535">
+                </label>
+                <label>
+                  CUPS queue
+                  <input name="cups_queue">
+                </label>
+                <label class="wide-field">
+                  Customer QR website
+                  <input name="public_base_url" placeholder="https://lasertag.yourdomain.com">
+                  <span class="field-note">Printed QR codes use this address. Set this to the public subdomain you route through Nginx Proxy Manager.</span>
+                </label>
+                <label>
+                  Ticket width
+                  <input name="ticket_width_chars" type="number" min="32" max="48">
+                </label>
+                <label>
+                  Print logo
+                  <select name="ticket_logo_enabled">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+                <div class="wide-field logo-upload-row">
+                  <label>
+                    Receipt logo image
+                    <input id="ticketLogoFile" type="file" accept="image/png,image/jpeg,image/webp">
+                    <span class="field-note">Converted to black and white for the thermal ticket printer.</span>
+                  </label>
+                  <figure class="logo-preview hidden" id="ticketLogoPreviewWrap">
+                    <img id="ticketLogoPreview" alt="Uploaded ticket logo preview">
+                    <figcaption>Current receipt logo</figcaption>
+                  </figure>
+                  <button class="secondary-action" id="clearLogo" type="button">Remove Logo</button>
+                  <p class="status-line" id="ticketLogoStatus"></p>
+                </div>
+                <label>
+                  Print QR code
+                  <select name="ticket_show_qr">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
+                <label>
+                  QR label
+                  <input name="ticket_qr_label" maxlength="80">
+                </label>
+              </div>
+              <button class="secondary-action" id="testPrinter" type="button">Test Printer</button>
+            </section>
+
+            <div class="settings-save wide-field">
+              <button class="primary-action" type="submit">Save Settings</button>
+              <p class="status-line" id="settingsStatus"></p>
+            </div>
+          </form>
+
+          <section class="settings-card password-card">
+            <div class="section-heading">
+              <h2>Logins</h2>
+              <span>Change shared passwords</span>
+            </div>
+            <form id="passwordForm" class="password-strip">
+              <label>
+                Login
+                <select name="username">
+                  <option value="admin">admin</option>
+                  <option value="marshal">marshal</option>
+                </select>
+              </label>
+              <label>
+                New password
+                <input name="password" type="password" minlength="6">
+              </label>
+              <button class="secondary-action" type="submit">Update Password</button>
+              <p class="status-line" id="passwordStatus"></p>
+            </form>
+          </section>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

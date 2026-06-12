@@ -1,0 +1,35 @@
+version: "2.4"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lasertag
+      POSTGRES_USER: lasertag
+      POSTGRES_PASSWORD: ${LASERTAG_DB_PASSWORD:-lasertag}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lasertag -d lasertag"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://lasertag:${LASERTAG_DB_PASSWORD:-lasertag}@db:5432/lasertag
+      LASERTAG_HOST: 0.0.0.0
+      LASERTAG_PORT: 8080
+      LASERTAG_SECRET: ${LASERTAG_SECRET:-laser-tag-scheduler-change-me}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  postgres-data:
+    name: ${POSTGRES_VOLUME_NAME:-laser-tag-scheduler-postgres-data}
