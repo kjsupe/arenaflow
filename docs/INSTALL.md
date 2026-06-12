@@ -109,9 +109,17 @@ Then configure:
 
 ## Reverse Proxy And QR Codes
 
-If customers will scan QR codes from home or cellular data, ArenaFlow needs a public HTTPS URL.
+If staff only use ArenaFlow on the local network for marshal scheduling, a reverse proxy is not required. Staff can use the local server address, such as:
 
-With Nginx Proxy Manager:
+```text
+http://SERVER-IP:8080
+```
+
+If customers will scan QR codes from home or cellular data and change their own ticket time, ArenaFlow needs a public HTTPS URL. A reverse proxy is the usual way to provide that URL.
+
+Common options include Nginx, Nginx Proxy Manager, Caddy, Traefik, and similar tools. ArenaFlow is not affiliated with any reverse proxy project, so use the one you already understand and can maintain.
+
+Example with Nginx Proxy Manager:
 
 1. Create a proxy host such as `games.example.com`.
 2. Forward it to the Linux server IP and the ArenaFlow `APP_PORT`.

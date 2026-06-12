@@ -21,13 +21,17 @@ openssl rand -base64 48
 
 ## Public URL Guidance
 
-Customer QR codes can point to the same app through a reverse proxy.
+Marshal scheduling can run on a local network address, such as `http://SERVER-IP:8080`. A public URL is only needed if customers will scan QR codes and change their own ticket time from outside your local network.
+
+For customer self-rescheduling, point QR codes to a public HTTPS URL that reaches ArenaFlow through a reverse proxy.
 
 Recommended:
 
 ```text
 https://games.example.com
 ```
+
+Common reverse proxy options include Nginx, Nginx Proxy Manager, Caddy, Traefik, and similar tools. ArenaFlow is not affiliated with any reverse proxy project, and operators should use the reverse proxy they already know and maintain.
 
 Set this in Admin settings as `Customer QR website`.
 
@@ -69,9 +73,9 @@ docker volume prune
 
 unless you are certain it will not delete ArenaFlow or other app data.
 
-## What Not To Publish
+## Sensitive Data
 
-Never commit or upload:
+Do not share, post, or commit:
 
 - `.env`
 - SQLite files
@@ -81,7 +85,7 @@ Never commit or upload:
 - Production screenshots with customer names or ticket codes
 - Real uploaded logos if you do not want them public
 
-The included `.gitignore` is configured to help prevent common mistakes, but review `git status` before every push.
+The included `.gitignore` is configured to help prevent common mistakes, but operators should still review files before sharing logs, screenshots, backups, or repo changes.
 
 ## Reporting Issues
 

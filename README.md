@@ -113,11 +113,15 @@ Mode: CUPS queue
 CUPS queue: queue name
 ```
 
-Set `Customer QR website` in Admin settings to the public HTTPS URL that points to this app, for example:
+For marshal scheduling only, ArenaFlow can stay on a local network address such as `http://SERVER-IP:8080`.
+
+If customer self-rescheduling is enabled and customers will scan QR codes from their own phones, set `Customer QR website` in Admin settings to a public HTTPS URL that points to this app through a reverse proxy, for example:
 
 ```text
 https://games.example.com
 ```
+
+Nginx, Nginx Proxy Manager, Caddy, Traefik, or similar reverse proxies can work. Use the tool you are comfortable maintaining; ArenaFlow is not affiliated with any of them.
 
 Each printed ticket gets a unique ticket code and PIN. The QR code points to that specific ticket, and the customer can only move it to another available time if customer self-rescheduling is enabled for that attraction.
 
