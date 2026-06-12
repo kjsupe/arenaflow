@@ -706,6 +706,20 @@ def get_attractions(db: Any, include_inactive: bool = False) -> list[dict[str, o
     return [row_to_attraction(row) for row in rows]
 
 
+def attraction_booking_count(db: Any, attraction_id: int) -> int:
+    row = execute(db, "SELECT COUNT(*) AS count FROM bookings WHERE attraction_id = ?", (attraction_id,)).fetchone()
+    return int(row["count"] or 0)
+
+
+def admin_attractions(db: Any) -> list[dict[str, object]]:
+    attractions = get_attractions(db, include_inactive=True)
+    for attraction in attractions:
+        booking_count = attraction_booking_count(db, int(attraction["id"]))
+        attraction["booking_count"] = booking_count
+        attraction["can_delete"] = booking_count == 0 and len(attractions) > 1
+    return attractions
+
+
 def get_attraction(db: Any, attraction_id: int | str | None = None, include_inactive: bool = True) -> dict[str, object]:
     if attraction_id is None or str(attraction_id).strip() == "":
         attractions = get_attractions(db, include_inactive=False)
@@ -789,6 +803,25 @@ def update_attraction(db: Any, payload: dict[str, object], actor_id: int) -> dic
     )
     write_audit(db, actor_id, "attraction_updated", f"attraction_id={attraction['id']} name={name}")
     return get_attraction(db, int(attraction["id"]), include_inactive=True)
+
+
+def delete_attraction(db: Any, attraction_id: int | str | None, actor_id: int) -> dict[str, object]:
+    attraction = get_attraction(db, attraction_id, include_inactive=True)
+    attraction_count = int(execute(db, "SELECT COUNT(*) AS count FROM attractions").fetchone()["count"] or 0)
+    if attraction_count <= 1:
+        raise AppError(400, "At least one attraction is required.")
+
+    booking_count = attraction_booking_count(db, int(attraction["id"]))
+    if booking_count:
+        raise AppError(
+            409,
+            "This attraction has booking history, so it cannot be deleted. Set 'Show on marshal schedule' to No instead.",
+        )
+
+    execute(db, "DELETE FROM capacity_events WHERE attraction_id = ?", (int(attraction["id"]),))
+    execute(db, "DELETE FROM attractions WHERE id = ?", (int(attraction["id"]),))
+    write_audit(db, actor_id, "attraction_deleted", f"attraction_id={attraction['id']} name={attraction['name']}")
+    return attraction
 
 
 def default_day_schedule(settings: dict[str, str]) -> dict[str, str]:
@@ -2355,7 +2388,7 @@ class LaserTagHandler(BaseHTTPRequestHandler):
         if method == "GET" and path == "/api/admin/settings":
             self.require_admin(actor)
             with connect_db() as db:
-                self.write_json({"settings": get_settings(db), "attractions": get_attractions(db, include_inactive=True)})
+                self.write_json({"settings": get_settings(db), "attractions": admin_attractions(db)})
             return
         if method == "POST" and path == "/api/admin/settings":
             self.require_admin(actor)
@@ -2364,14 +2397,21 @@ class LaserTagHandler(BaseHTTPRequestHandler):
                 update_settings(db, payload.get("settings", {}), int(actor["id"]))
                 if isinstance(payload.get("attraction"), dict):
                     update_attraction(db, payload["attraction"], int(actor["id"]))
-                self.write_json({"settings": get_settings(db), "attractions": get_attractions(db, include_inactive=True)})
+                self.write_json({"settings": get_settings(db), "attractions": admin_attractions(db)})
             return
         if method == "POST" and path == "/api/admin/attractions":
             self.require_admin(actor)
             payload = self.read_json()
             with connect_db() as db:
                 attraction = create_attraction(db, payload, int(actor["id"]))
-                self.write_json({"attraction": attraction, "attractions": get_attractions(db, include_inactive=True)})
+                self.write_json({"attraction": attraction, "attractions": admin_attractions(db)})
+            return
+        if method == "DELETE" and path.startswith("/api/admin/attractions/"):
+            self.require_admin(actor)
+            attraction_id = path.rsplit("/", 1)[-1]
+            with connect_db() as db:
+                deleted = delete_attraction(db, attraction_id, int(actor["id"]))
+                self.write_json({"deleted_attraction": public_attraction(deleted), "attractions": admin_attractions(db)})
             return
         if method == "POST" and path == "/api/admin/password":
             self.require_admin(actor)

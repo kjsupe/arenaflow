@@ -109,6 +109,8 @@ const els = {
   settingsStatus: document.getElementById("settingsStatus"),
   adminAttractionTabs: document.getElementById("adminAttractionTabs"),
   addAttraction: document.getElementById("addAttraction"),
+  deleteAttraction: document.getElementById("deleteAttraction"),
+  deleteAttractionHint: document.getElementById("deleteAttractionHint"),
   attractionName: document.getElementById("attractionName"),
   attractionActive: document.getElementById("attractionActive"),
   weeklySchedule: document.getElementById("weeklySchedule"),
@@ -916,12 +918,33 @@ function fillGlobalSettings(settings) {
   }
 }
 
+function updateAttractionDeleteState(attraction) {
+  if (!els.deleteAttraction || !els.deleteAttractionHint) return;
+  if (!attraction) {
+    els.deleteAttraction.disabled = true;
+    els.deleteAttractionHint.textContent = "Select an attraction before deleting.";
+    return;
+  }
+
+  const bookingCount = Number(attraction.booking_count || 0);
+  const canDelete = Boolean(attraction.can_delete);
+  els.deleteAttraction.disabled = !canDelete;
+  if (state.adminAttractions.length <= 1) {
+    els.deleteAttractionHint.textContent = "At least one attraction is required.";
+  } else if (bookingCount > 0) {
+    els.deleteAttractionHint.textContent = `${bookingCount} booking${bookingCount === 1 ? "" : "s"} use this attraction. Hide it from the marshal schedule instead.`;
+  } else {
+    els.deleteAttractionHint.textContent = "This unused attraction can be permanently deleted.";
+  }
+}
+
 function fillAttractionSettings() {
   const attraction = selectedAdminAttraction();
   renderAdminAttractionTabs();
   if (!attraction) {
     els.attractionName.value = "";
     els.attractionActive.value = "yes";
+    updateAttractionDeleteState(null);
     return;
   }
   els.attractionName.value = attraction.name || "";
@@ -938,6 +961,7 @@ function fillAttractionSettings() {
   state.scheduleOverrides = Array.isArray(overrides) ? overrides : [];
   renderScheduleOverrides();
   resetOverrideDraft(settings);
+  updateAttractionDeleteState(attraction);
 }
 
 async function loadAdminSettings() {
@@ -1137,6 +1161,39 @@ els.addAttraction.addEventListener("click", async () => {
     state.adminSelectedAttractionId = Number(data.attraction.id);
     fillAttractionSettings();
     setStatus(els.settingsStatus, "Attraction added. Save settings after any schedule changes.", "ok");
+  } catch (error) {
+    setStatus(els.settingsStatus, error.message, "error");
+  }
+});
+
+els.deleteAttraction.addEventListener("click", async () => {
+  const attraction = selectedAdminAttraction();
+  if (!attraction) {
+    setStatus(els.settingsStatus, "Select an attraction first.", "error");
+    return;
+  }
+  if (!attraction.can_delete) {
+    const bookingCount = Number(attraction.booking_count || 0);
+    const reason = bookingCount > 0
+      ? "This attraction has booking history. Set 'Show on marshal schedule' to No instead."
+      : "At least one attraction is required.";
+    setStatus(els.settingsStatus, reason, "error");
+    return;
+  }
+  if (!window.confirm(`Delete "${attraction.name}"? This permanently removes the attraction and its capacity changes.`)) {
+    return;
+  }
+  setStatus(els.settingsStatus, "Deleting attraction...");
+  try {
+    const data = await api(`/api/admin/attractions/${attraction.id}`, { method: "DELETE" });
+    state.adminAttractions = data.attractions || [];
+    if (Number(state.selectedAttractionId) === Number(attraction.id)) {
+      state.selectedAttractionId = null;
+    }
+    state.adminSelectedAttractionId = (state.adminAttractions[0] && Number(state.adminAttractions[0].id)) || null;
+    fillAttractionSettings();
+    await loadState();
+    setStatus(els.settingsStatus, "Attraction deleted.", "ok");
   } catch (error) {
     setStatus(els.settingsStatus, error.message, "error");
   }

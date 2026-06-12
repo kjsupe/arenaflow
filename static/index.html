@@ -43,7 +43,7 @@
             <button class="ghost-action nav-action active" id="scheduleToggle" type="button">Schedule</button>
             <button class="ghost-action nav-action" id="settingsToggle" type="button">Settings</button>
             <span class="session-pill" id="sessionUser"></span>
-            <button class="ghost-action" id="logoutButton" type="button">Log Out</button>
+                <button class="ghost-action" id="logoutButton" type="button">Log Out</button>
           </div>
         </header>
 
@@ -212,6 +212,13 @@
                     <option value="no">No</option>
                   </select>
                 </label>
+              </div>
+              <div class="danger-zone">
+                <div>
+                  <strong>Remove selected attraction</strong>
+                  <span id="deleteAttractionHint">Only unused attractions can be deleted. Hide attractions that already have bookings.</span>
+                </div>
+                <button class="danger-action" id="deleteAttraction" type="button">Delete Attraction</button>
               </div>
             </section>
 

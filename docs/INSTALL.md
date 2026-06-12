@@ -28,7 +28,7 @@ ArenaFlow works with either command. Use `docker compose` where available.
 ```bash
 sudo mkdir -p /opt/arenaflow
 sudo chown "$USER:$USER" /opt/arenaflow
-git clone https://github.com/YOUR-USER/arenaflow.git /opt/arenaflow
+git clone https://github.com/kjsupe/arenaflow.git /opt/arenaflow
 cd /opt/arenaflow
 ```
 
@@ -162,7 +162,7 @@ Enable the WSL2 backend when Docker Desktop asks.
 Open PowerShell:
 
 ```powershell
-git clone https://github.com/YOUR-USER/arenaflow.git
+git clone https://github.com/kjsupe/arenaflow.git
 cd arenaflow
 Copy-Item .env.example .env
 notepad .env

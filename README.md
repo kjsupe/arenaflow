@@ -14,6 +14,7 @@ ArenaFlow is free to use. If it saves your FEC time or helps your operation, don
 
 - Admin and marshal logins.
 - Multiple attractions with schedule tabs.
+- Safe deletion for unused test attractions.
 - Per-attraction opening time, first game time, closing time, interval, and capacity.
 - Per-attraction weekday/weekend schedules.
 - Holiday or special-date overrides.
@@ -42,7 +43,7 @@ Marshals can:
 Admins can also:
 
 - Change attraction schedules.
-- Add or hide attractions.
+- Add, hide, or delete unused attractions.
 - Configure printer settings.
 - Configure customer QR website settings.
 - Change themes, logos, and shared passwords.
@@ -52,7 +53,7 @@ Admins can also:
 Linux with Docker is the recommended production setup.
 
 ```bash
-git clone https://github.com/YOUR-USER/arenaflow.git
+git clone https://github.com/kjsupe/arenaflow.git
 cd arenaflow
 cp .env.example .env
 nano .env
@@ -76,7 +77,11 @@ Change both passwords immediately from the Admin settings screen before using Ar
 
 Detailed Linux and Windows instructions are in [docs/INSTALL.md](docs/INSTALL.md).
 
+Basic operating instructions are in [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
+
 GitHub publishing steps are in [docs/PUBLISHING.md](docs/PUBLISHING.md).
+
+Support expectations are in [SUPPORT.md](SUPPORT.md).
 
 ## Production Safety
 
@@ -168,6 +173,8 @@ docker-compose -p laser-tag-scheduler up -d --build
 ## Project Status
 
 ArenaFlow is intentionally simple. It is not a point-of-sale system and does not manage payments. It is meant to fill the operational gap between POS sales and attraction/game loading.
+
+ArenaFlow is released for free with no guaranteed support or emergency response. See [SUPPORT.md](SUPPORT.md).
 
 ## License
 

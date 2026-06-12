@@ -288,7 +288,8 @@ h2 {
 
 .primary-action,
 .secondary-action,
-.ghost-action {
+.ghost-action,
+.danger-action {
   min-height: 42px;
   display: inline-flex;
   align-items: center;
@@ -302,7 +303,8 @@ h2 {
 
 .primary-action:hover,
 .secondary-action:hover,
-.ghost-action:hover {
+.ghost-action:hover,
+.danger-action:hover {
   transform: translateY(-1px);
 }
 
@@ -322,6 +324,18 @@ h2 {
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
+}
+
+.danger-action {
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line));
+  background: color-mix(in srgb, var(--danger) 8%, var(--paper));
+  color: var(--danger);
+}
+
+.danger-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 
 .nav-action.active {
@@ -777,6 +791,34 @@ h2 {
   align-items: start;
 }
 
+.danger-zone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--danger) 22%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--danger) 5%, var(--paper));
+  padding: 12px;
+}
+
+.danger-zone strong,
+.danger-zone span {
+  display: block;
+}
+
+.danger-zone strong {
+  font-size: 0.88rem;
+}
+
+.danger-zone span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
 .admin-attraction-tabs {
   padding-bottom: 0;
 }
@@ -1036,7 +1078,8 @@ h2 {
     display: grid;
   }
 
-  .settings-attraction-header {
+  .settings-attraction-header,
+  .danger-zone {
     grid-template-columns: 1fr;
   }
 }
